@@ -1,0 +1,63 @@
+.main	{
+	width:958px;
+	margin:10px auto;
+	
+}
+.head{
+	width:350px;
+	margin:20px auto;
+}
+.content{
+	width:960px;
+	margin:0px auto;
+}
+.content h3{
+	float:left;
+	clear:both;
+	width:958px;
+	font-weight: bold;
+	font: oblique normal bold 2em Arial, sans-serif;
+}
+.content li{
+	margin:20px 0px;
+	width:100%;
+	float:left;
+	border-bottom: 1px dotted #CCC;
+	list-style-type: none;
+	
+}
+.title{
+	width:400px;
+	float:left;
+}
+.price{
+	width:100px;
+	float:left;
+}
+.brand{
+	width:150px;
+	float:left;
+}
+.model{
+	width:350px;
+	float:left;
+}
+.fuel{
+	width:100px;
+	float:left;
+}
+.operation{
+	clear:both;
+	margin:10px auto;
+	font: 22px "Lucida Grande", "Trebuchet MS", Verdana, sans-serif;
+}
+div.notice {
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+	width: 40%;
+	border: 5px solid #ccc;
+	margin-top: 50px;
+	padding: 20px;
+	font-weight: bold;
+}

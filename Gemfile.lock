@@ -87,6 +87,7 @@ GEM
     unicorn (3.5.0)
       kgio (~> 2.3)
       rack
+    yaml_db (0.2.0)
 
 PLATFORMS
   ruby
@@ -100,3 +101,4 @@ DEPENDENCIES
   sqlite3-ruby
   thin
   unicorn
+  yaml_db

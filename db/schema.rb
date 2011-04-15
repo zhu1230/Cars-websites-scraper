@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110410142349) do
+ActiveRecord::Schema.define(:version => 20110415120045) do
 
   create_table "cars", :force => true do |t|
     t.string   "title"
@@ -20,7 +20,7 @@ ActiveRecord::Schema.define(:version => 20110410142349) do
     t.integer  "roles_mask"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "derive"
+    t.string   "derive"
   end
 
   create_table "categories", :force => true do |t|

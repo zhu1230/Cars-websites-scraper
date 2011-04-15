@@ -1,5 +1,6 @@
 # coding: utf-8
 class Car < ActiveRecord::Base
+	set_inheritance_column :derive
 	require 'open-uri'
 		# require 'syck'
 	# require 

@@ -13,6 +13,7 @@ gem 'mysql2'
 gem 'role_model'
 gem "delayed_job",  :git => 'git://github.com/collectiveidea/delayed_job.git'
 gem 'thin'
+gem 'yaml_db'
 # gem 'johnson',:git => "git://github.com/jbarnette/johnson.git", :branch => '1.9.1'
 # Deploy with Capistrano
 # gem 'capistrano'

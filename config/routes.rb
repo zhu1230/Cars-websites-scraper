@@ -50,7 +50,7 @@ get 'fetch/:action',:controller => 'fetch'
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-  # root :to => "welcome#index"
+  root :to => "fetch#index"
 
   # See how all your routes lay out with "rake routes"
 

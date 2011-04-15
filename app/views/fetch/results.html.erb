@@ -1,0 +1,13 @@
+<div class='main'>
+	<div class='head'>
+		<h1>Show Results for demo</h1>
+		
+	</div>
+	<div class='operation'><%=link_to "refresh data"%></div>
+	<div class='content'>
+		<h3>Auto.Vlan.De(<%=AutoVlanDe.count%>)</h3>
+		<%= render :partial => 'car',:collection => AutoVlanDe.all %>
+		<h3>Fr.Autoscout24.De(<%=FrAutoscout24Be.count%>)</h3>
+		<%= render :partial => 'car',:collection => FrAutoscout24Be.all %>
+	</div>
+</div>

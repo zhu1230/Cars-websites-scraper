@@ -5,21 +5,31 @@ class FrAutoscout24Be < Car
 	def self.execute
 
 
-			Car.where("derive = 2").destroy_all
+			FrAutoscout24Be.destroy_all
 			hash=testjson
+		
 			hash['root']['c'].each do |m|
 				brand=hash[m]['t'].downcase
 				brand_id=m.gsub('m','')
+				
 				hash[m]['c'].each do |t|
 					type=hash[t]['t'].downcase
 					type_id=t.gsub('d','')
-					# puts brand+"|"+type+"|"+type_id
+					puts brand+"|"+type+"|"+type_id
 					next if Category.where("name like ? and parent_id is null","%"+brand+"%").first.nil?
 					c=Category.where("name like ?  and parent_id is null","%"+brand+"%").first.children.where("name like ?","%"+type+"%").first || Category.where("name like ? and parent_id is null","%"+brand+"%").first.children.last
-					# puts "http://fr.autoscout24.be/ListGN.aspx?atype=C&mmvmk0=#{brand_id}&mmvmd0=#{type_id}&mmvco=1&make=#{brand_id}&model=#{type_id}&pricefrom=500&cy=B&zipc=B&ustate=N,U&nm=False"
+					 puts "http://fr.autoscout24.be/ListGN.aspx?atype=C&mmvmk0=#{brand_id}&mmvmd0=#{type_id}&mmvco=1&make=#{brand_id}&model=#{type_id}&pricefrom=500&cy=B&zipc=B&ustate=N,U&nm=False"
 					doc2=getdom("http://fr.autoscout24.be/ListGN.aspx?atype=C&mmvmk0=#{brand_id}&mmvmd0=#{type_id}&mmvco=1&make=#{brand_id}&model=#{type_id}&pricefrom=500&cy=B&zipc=B&ustate=N,U&nm=False")
-					result= doc2.css('script')[16].content
-					result.match(/(?<=new Car\().*(?=\);)/) do |m|
+					# result= doc2.css('script')[16].content
+				res	=(doc2.css('script').detect do |f|
+					next unless f
+					puts "---------------------------------------------"
+					puts f.content
+						f.content.include?("var cars=new Array();")
+					end)
+					next if res.nil?
+					result=res.content
+					result.scan(/(?<=new Car\().*?(?=\);)/) do |m|
 						result=m.to_s.gsub(',true',',\'\'').gsub(',false',',\'\'').split(/','/)
 						price= result[4].to_s.delete(",").delete('.').delete('€').delete('-').strip.to_i
 						year=(unless result[8].strip=='-/-'
@@ -30,13 +40,12 @@ class FrAutoscout24Be < Car
 						title= result[11]
 						fuel= result[22]
 						puts c.name+price.to_s+"|"+year.to_s+"|"+title+"|"+fuel
-						car=Car.new
+						car=FrAutoscout24Be.new
 						car.price=price
 						car.year=year
 						car.title=title.strip
 						car.roles << fuel.strip.downcase.to_sym
 						car.category=c
-						car.derive=2
 						car.save
 								end
 					
@@ -63,8 +72,11 @@ class FrAutoscout24Be < Car
 	end
 	def self.teststr
 		f=%Q{//<![CDATA[
-		var cars=new Array();cars[0]=new Car('http://pic.autoscout24.net/images-small/049/919/0192919049001.jpg','2 photos','http://fr.autoscout24.be/Details.aspx?id=192919049',false,'€ 16.800,-','0','','31.000','09/2009','99','135','Abarth 500 ','','ABS, Airbag conducteur, Airbag passager, Airbags latéraux, Anti-démarrage',false,'B-1000','bruxelles','','','stickers rouge abarth','Abarth','500','Essence',false,'192919049','Boîte manuelle',false,'',false,'','',false,'2/3-Portes','','0,0','0','','',false,false);//]]>}
-		f.match(/(?<=new Car\().*(?=\);)/) do |m|
+		var cars=new Array();cars[0]=new Car('http://pic.autoscout24.net/images-small/617/066/0190066617001.jpg','6 photos','http://fr.autoscout24.be/Details.aspx?id=190066617&asrc=fa',false,'€ 12.595,-','0','','21.020','09/2009','70','95','AC Cobra Citroën C3 Picasso 1.4i Seduction + Pano + PDC +','3 JAAR GARANTIE / GARANTIE 3 ANS','ABS, Airbag conducteur, Airbag passager, Climatisation',false,'B-8830','Hooglede (tussen Brugge en Kortrijk)','http://pic.autoscout24.net/dealerlogo/small/9/4/0000007449001.jpg?3135','','Zilver Métalisé','AC','Cobra','Essence',true,'190066617','Boîte manuelle',false,'http://fr.autoscout24.be/CustomerArticles.aspx?cid=7449&asrc=190066617',false,'','',false,'Break','','0,0','0','','',false,false);cars[1]=new Car('http://pic.autoscout24.net/images-small/889/875/0188875889001.jpg','5 photos','http://fr.autoscout24.be/Details.aspx?id=188875889',false,'€ 16.500,-','0','','12.000','06/1994','115','156','AC Cobra Pilgrim Sumo','','Sellerie cuir',false,'B-1440','braine le chateau','','','Bleu Métalisé','AC','Cobra','Essence',false,'188875889','Boîte manuelle',false,'',false,'','',true,'Cabriolet','1','0,0','0','','',false,false);cars[2]=new Car('http://pic.autoscout24.net/images-small/564/913/0180913564001.jpg','8 photos','http://fr.autoscout24.be/Details.aspx?id=180913564',false,'€ 23.000,-','0','','7.700','10/2002','184','250','AC Cobra CABRIO ','','Jantes alliage',false,'B-2200','Herentals','','','Bronze Métalisé','AC','Cobra','Essence',false,'180913564','Boîte automatique',false,'',false,'','',false,'Cabriolet','1','0,0','0','','',false,false);cars[3]=new Car('http://pic.autoscout24.net/images-small/380/883/0186883380001.jpg','6 photos','http://fr.autoscout24.be/Details.aspx?id=186883380',false,'€ 23.500,-','0','','13.700','01/1979','79','107','AC Cobra Viper 2.3 V6 (violet) RHD','','',false,'B-9880','Aalter','','','Mauve','AC','Cobra','Essence',false,'186883380','Boîte automatique',false,'',false,'','',false,'Cabriolet','','0,0','0','','',false,false);cars[4]=new Car('http://pic.autoscout24.net/images-small/382/329/0192329382001.jpg','2 photos','http://fr.autoscout24.be/Details.aspx?id=192329382',false,'€ 30.500,-','0','','10.000','09/1965','320','435','AC Cobra ','','',false,'B-1650','Beersel','','','gris/bleu','AC','Cobra','Essence',false,'192329382','Boîte manuelle',false,'',false,'','',false,'Cabriolet','1','0,0','0','','',false,false);cars[5]=new Car('http://pic.autoscout24.net/images-small/282/348/0182348282001.jpg','10 photos','http://fr.autoscout24.be/Details.aspx?id=182348282',false,'€ 38.500,-','0','','7.000','06/1984','162','220','AC Cobra ','','Jantes alliage, Radio/CD, Sellerie cuir',false,'B-4820','Dison','','','Blanc','AC','Cobra','Essence',false,'182348282','Boîte manuelle',false,'',false,'','',false,'Cabriolet','','0,0','0','','',false,false);cars[6]=new Car('http://pic.autoscout24.net/images-small/901/414/0158414901001.jpg','8 photos','http://fr.autoscout24.be/Details.aspx?id=158414901',false,'€ 45.000,-','0','','18','09/1965','184','250','AC Cobra REPLICA','','',false,'B-3800','Sint-Truiden','','','Bleu','AC','Cobra','Essence',false,'158414901','Boîte manuelle',false,'',false,'','',false,'Cabriolet','','0,0','0','','',false,false);cars[7]=new Car('http://pic.autoscout24.net/images-small/514/753/0167753514001.jpg','13 photos','http://fr.autoscout24.be/Details.aspx?id=167753514',false,'€ 48.000,-','0','','2.560','09/1965','257','349','AC Cobra 427 REPLICA','','Jantes alliage, Sellerie cuir',false,'B-3800','Sint-Truiden','','','Rouge','AC','Cobra','Essence',false,'167753514','Boîte manuelle',false,'',false,'','',false,'Cabriolet','','0,0','0','','',false,false);cars[8]=new Car('http://pic.autoscout24.net/images-small/028/818/0189818028001.jpg','14 photos','http://fr.autoscout24.be/Details.aspx?id=189818028',false,'€ 48.000,-','0','','9.494','09/1976','1','1','AC Cobra 427 REPLICA','','',false,'B-3800','Sint-Truiden','','','Bleu','AC','Cobra','Essence',false,'189818028','Boîte manuelle',false,'',false,'','',false,'Cabriolet','','0,0','0','','',false,false);cars[9]=new Car('http://pic.autoscout24.net/images-small/345/122/0166122345001.jpg','15 photos','http://fr.autoscout24.be/Details.aspx?id=166122345',false,'€ 139.950,-','0','','427','09/1965','461','627','AC Cobra 427 Caroll Shelby !!!','','Tuning',false,'B-1020','Bruxelles','','','Bleu Métalisé','AC','Cobra','Essence',false,'166122345','Boîte manuelle',false,'',false,'','',true,'Cabriolet','','0,0','0','','',false,false);cars[10]=new Car('http://pic.autoscout24.net/images-small/029/827/0189827029001.jpg','15 photos','http://fr.autoscout24.be/Details.aspx?id=189827029',false,'€ 275.000,-','0','','300','01/1966','331','450','AC Cobra MkIII 427','','',false,'B-9100','Sint-Niklaas','','','Rouge','AC','Cobra','Essence',false,'189827029','Boîte manuelle',false,'',false,'','',false,'Cabriolet','1','0,0','0','','',false,false);//]]>}
+		# f.scan(/(?<=new Car\().*(?=\);car)/) do |m|
+		# puts f.scan(/new Car/).size
+		f.scan(/(?<=new Car\().*?(?=\);)/) do |m|
+			puts m
 			result=m.to_s.gsub(',true',',\'\'').gsub(',false',',\'\'').split(/','/)
 			puts result[4].to_s.delete(",").delete('.').delete('€').delete('-').strip.to_i
 			puts result[8]

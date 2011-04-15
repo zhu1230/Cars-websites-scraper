@@ -1,7 +1,7 @@
 # coding: utf-8
 class AutoVlanDe < Car
 	def self.execute
-		Car.destroy_all('derive=1')
+		AutoVlanDe.destroy_all
 		doc=Nokogiri::HTML(open('http://auto.vlan.be/en/second-hand-car/per-make-category'))
 		doc.css('div.s_content_block_text ul li').each do |li|
 
@@ -34,10 +34,10 @@ class AutoVlanDe < Car
 					# puts li3.to_s
 					ob=li3.at_css("td[rowspan='2'] > a  strong")
 					unless ob.nil?
-						c=Car.new
+						c=AutoVlanDe.new
 						c.title=ob.content
 						date=ob.parent.parent.next.next.next.next.content.strip.split('/')
-
+						date=100.years.from_now.to_datetime.to_date if date.empty?
 							if date.size>1 && date.first.to_i < 10
 								date[0] = "0" + date.first.to_i.to_s
 							end
@@ -46,7 +46,6 @@ class AutoVlanDe < Car
 						c.price=ob.parent.parent.next.next.next.next.next.next.content.gsub("€ ","").gsub(',','').strip
 						c.roles << ob.parent.parent.parent.next.next.at_css('td').content.split(',').last.strip.downcase.to_sym
 						c.category=cate
-						c.derive=1
 						c.save
 						puts "saved! "+c.title
 					end
